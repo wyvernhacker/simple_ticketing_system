@@ -2,16 +2,15 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
-const path = require('path'); // Import path for serving static files
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Configure the email transporter
 let transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
@@ -22,11 +21,9 @@ let transporter = nodemailer.createTransport({
   },
 });
 
-// Endpoint to submit a ticket
 app.post('/submit-ticket', async (req, res) => {
   const { userEmail, subject, message } = req.body;
 
-  // Email options
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: process.env.ADMIN_EMAIL,
@@ -37,7 +34,6 @@ app.post('/submit-ticket', async (req, res) => {
   };
 
   try {
-    // Send the email
     let info = await transporter.sendMail(mailOptions);
     console.log(`Email sent: ${info.messageId}`);
     res.status(200).json({ message: 'Ticket submitted successfully!' });
@@ -47,9 +43,9 @@ app.post('/submit-ticket', async (req, res) => {
   }
 });
 
-// // Start the server
-// app.listen(PORT, () => {
-//   console.log(`Server is running on http://localhost:${PORT}`);
-// });
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
 
 module.exports = app; // Export the app instead of starting the server
